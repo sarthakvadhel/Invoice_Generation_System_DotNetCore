@@ -1,0 +1,12 @@
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/bin/Debug/net9.0/InvoiceSystem.Shared.deps.json
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/bin/Debug/net9.0/InvoiceSystem.Shared.dll
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/bin/Debug/net9.0/InvoiceSystem.Shared.pdb
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.AssemblyInfoInputs.cache
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.AssemblyInfo.cs
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.csproj.CoreCompileInputs.cache
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.sourcelink.json
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.dll
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/refint/InvoiceSystem.Shared.dll
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/InvoiceSystem.Shared.pdb
+/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/Debug/net9.0/ref/InvoiceSystem.Shared.dll

@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InvoiceSystem.API/InvoiceSystem.API.csproj" />
+    <Project Path="src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj" />
+    <Project Path="src/InvoiceSystem.Web/InvoiceSystem.Web.csproj" />
+  </Folder>
+</Solution>
