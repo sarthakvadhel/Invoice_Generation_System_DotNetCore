@@ -26,20 +26,12 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Web/Components/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Db3VudGVyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Web/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Web/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ib21lLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Web/Components/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWF0aGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Web/Components/Routes.razor]

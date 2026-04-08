@@ -1,6 +1,9 @@
 @InvoiceSystem.API_HostAddress = http://localhost:5065
 
-GET {{InvoiceSystem.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### List all invoices (example – implement endpoint first)
+# GET {{InvoiceSystem.API_HostAddress}}/api/invoices
+# Accept: application/json
 
-###
+### List all customers (example – implement endpoint first)
+# GET {{InvoiceSystem.API_HostAddress}}/api/customers
+# Accept: application/json
