@@ -1,0 +1,28 @@
+﻿<nav class="navbar navbar-expand navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand text-white" href="">Aimbys Solutions</a>
+
+        <div class="navbar-nav nav-left-menu ms-3 me-auto">
+            <NavLink class="nav-link menu-link" href="" Match="NavLinkMatch.All">
+                <span class="menu-icon menu-icon-home" aria-hidden="true"></span>
+                Home
+            </NavLink>
+
+            <NavLink class="nav-link menu-link" href="invoices">
+                <span class="menu-icon menu-icon-invoices" aria-hidden="true"></span>
+                Invoices
+            </NavLink>
+
+            <NavLink class="nav-link menu-link" href="customers">
+                <span class="menu-icon menu-icon-customers" aria-hidden="true"></span>
+                Customers
+            </NavLink>
+
+            <NavLink class="nav-link menu-link" href="items">
+                <span class="menu-icon menu-icon-items" aria-hidden="true"></span>
+                Items
+            </NavLink>
+        </div>
+    </div>
+</nav>
+

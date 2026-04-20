@@ -1,0 +1,33 @@
+﻿<nav class="app-sidebar">
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle" />
+
+    <div class="sidebar-shell">
+        <div class="sidebar-header">
+            <a class="brand-link" href="">Aimbys Solutions</a>
+            <label class="toggle-button" for="sidebar-toggle" title="Toggle menu">☰</label>
+        </div>
+
+        <div class="menu-list">
+            <NavLink class="menu-link" href="" Match="NavLinkMatch.All">
+                <span class="menu-icon menu-icon-home" aria-hidden="true"></span>
+                <span class="menu-text">Home</span>
+            </NavLink>
+
+            <NavLink class="menu-link" href="invoices">
+                <span class="menu-icon menu-icon-invoices" aria-hidden="true"></span>
+                <span class="menu-text">Invoices</span>
+            </NavLink>
+
+            <NavLink class="menu-link" href="customers">
+                <span class="menu-icon menu-icon-customers" aria-hidden="true"></span>
+                <span class="menu-text">Customers</span>
+            </NavLink>
+
+            <NavLink class="menu-link" href="items">
+                <span class="menu-icon menu-icon-items" aria-hidden="true"></span>
+                <span class="menu-text">Items</span>
+            </NavLink>
+        </div>
+    </div>
+</nav>
+

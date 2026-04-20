@@ -1,0 +1,9 @@
+﻿@page "/about"
+
+<PageTitle>About</PageTitle>
+
+<h1>About</h1>
+
+<p>
+    This is a simple Blazor Server app for managing customers and invoices.
+</p>

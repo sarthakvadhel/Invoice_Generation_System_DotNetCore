@@ -1,0 +1,116 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace InvoiceSystem.Web.Services;
+
+public sealed class ItemCatalogService
+{
+    private readonly object _gate = new();
+    private readonly List<ItemCatalogEntry> _items = new();
+    private int _nextId = 1;
+
+    public ItemCatalogService()
+    {
+        Add(new ItemCatalogEntry { Name = "Apple", Details = "Fresh red apple" });
+        Add(new ItemCatalogEntry { Name = "Apricot", Details = "Sweet apricot" });
+        Add(new ItemCatalogEntry { Name = "Avocado", Details = "Premium avocado" });
+        Add(new ItemCatalogEntry { Name = "Banana", Details = "Organic banana" });
+    }
+
+    public IReadOnlyList<ItemCatalogEntry> GetAll()
+    {
+        lock (_gate)
+        {
+            return _items
+                .OrderBy(i => i.Name)
+                .ToList();
+        }
+
+    public bool Update(ItemCatalogEntry item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        var name = item.Name?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Item name is required.");
+        }
+
+        lock (_gate)
+        {
+            if (_items.Any(i => i.Id != item.Id && string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException("Item already exists.");
+            }
+
+            var existing = _items.FirstOrDefault(i => i.Id == item.Id);
+            if (existing is null)
+            {
+                return false;
+            }
+
+            existing.Name = name;
+            existing.Details = item.Details?.Trim();
+            return true;
+        }
+    }
+    }
+
+    public ItemCatalogEntry Add(ItemCatalogEntry item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        var name = item.Name?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Item name is required.");
+        }
+
+        lock (_gate)
+        {
+            if (_items.Any(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException("Item already exists.");
+            }
+
+            item.Id = _nextId++;
+            item.Name = name;
+            item.Details = item.Details?.Trim();
+
+            _items.Add(item);
+            return item;
+        }
+    }
+
+    public bool Delete(int id)
+    {
+        lock (_gate)
+        {
+            var item = _items.FirstOrDefault(x => x.Id == id);
+            if (item is null)
+            {
+                return false;
+            }
+
+            _items.Remove(item);
+            return true;
+        }
+    }
+}
+
+public sealed class ItemCatalogEntry
+{
+    public int Id { get; set; }
+
+    [Required]
+    [MaxLength(200)]
+    public string Name { get; set; } = string.Empty;
+
+    [MaxLength(500)]
+    public string? Details { get; set; }
+}

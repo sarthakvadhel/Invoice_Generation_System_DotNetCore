@@ -1,0 +1,90 @@
+﻿using InvoiceSystem.Shared.Models;
+
+namespace InvoiceSystem.Web.Services;
+
+public sealed class CustomerService
+{
+    private readonly object _gate = new();
+    private readonly List<Customer> _customers = new();
+    private int _nextId = 1;
+
+    public IReadOnlyList<Customer> GetAll()
+    {
+        lock (_gate)
+        {
+            return _customers
+                .OrderBy(c => c.Name)
+                .ToList();
+        }
+    }
+
+    public Customer? GetById(int id)
+    {
+        lock (_gate)
+        {
+            return _customers.FirstOrDefault(c => c.Id == id);
+        }
+    }
+
+    public Customer Add(Customer customer)
+    {
+        if (customer is null)
+        {
+            throw new ArgumentNullException(nameof(customer));
+        }
+
+        lock (_gate)
+        {
+            customer.Id = _nextId++;
+            customer.CreatedAt = DateTime.UtcNow;
+            customer.Invoices ??= new List<Invoice>();
+
+            _customers.Add(customer);
+            return customer;
+        }
+    }
+
+    public bool Update(Customer customer)
+    {
+        if (customer is null)
+        {
+            throw new ArgumentNullException(nameof(customer));
+        }
+
+        lock (_gate)
+        {
+            var existing = _customers.FirstOrDefault(c => c.Id == customer.Id);
+            if (existing is null)
+            {
+                return false;
+            }
+
+            existing.Name = customer.Name;
+            existing.Email = customer.Email;
+            existing.Phone = customer.Phone;
+            existing.Address = customer.Address;
+
+            return true;
+        }
+    }
+
+    public bool Delete(int id)
+    {
+        lock (_gate)
+        {
+            var customer = _customers.FirstOrDefault(c => c.Id == id);
+            if (customer is null)
+            {
+                return false;
+            }
+
+            if (customer.Invoices is { Count: > 0 })
+            {
+                return false;
+            }
+
+            _customers.Remove(customer);
+            return true;
+        }
+    }
+}

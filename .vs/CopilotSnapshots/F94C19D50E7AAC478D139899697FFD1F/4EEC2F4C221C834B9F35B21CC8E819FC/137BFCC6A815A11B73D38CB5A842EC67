@@ -1,0 +1,24 @@
+﻿<nav class="navbar navbar-expand navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="">Invoice System</a>
+
+        <div class="navbar-nav ms-auto">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                Home
+            </NavLink>
+
+            <NavLink class="nav-link" href="invoices">
+                Invoices
+            </NavLink>
+
+            <NavLink class="nav-link" href="customers">
+                Customers
+            </NavLink>
+
+            <NavLink class="nav-link" href="about">
+                About
+            </NavLink>
+        </div>
+    </div>
+</nav>
+

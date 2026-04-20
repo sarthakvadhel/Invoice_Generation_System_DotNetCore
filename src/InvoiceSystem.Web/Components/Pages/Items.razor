@@ -1,0 +1,178 @@
+@page "/items"
+
+@inject ItemCatalogService ItemCatalogService
+
+<PageTitle>Items</PageTitle>
+
+<h1>Items</h1>
+
+@if (!string.IsNullOrWhiteSpace(_error))
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+<div class="d-flex flex-column gap-4">
+    <div class="card shadow-sm form-card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span>@(_isEditMode ? "Edit item" : "Add item")</span>
+            @if (_isEditMode)
+            {
+                <button type="button" class="btn btn-sm btn-light" @onclick="CancelEdit">Cancel</button>
+            }
+        </div>
+        <div class="card-body">
+            <EditForm Model="_model" OnValidSubmit="SaveItem" FormName="add-item">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Item name</label>
+                        <InputText class="form-control" @bind-Value="_model.Name" />
+                        <ValidationMessage For="() => _model.Name" />
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Details</label>
+                        <InputTextArea class="form-control" @bind-Value="_model.Details" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">@(_isEditMode ? "Update item" : "Save item")</button>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">Item records</div>
+        <div class="card-body">
+            @if (_items.Count == 0)
+            {
+                <div class="text-muted">No items yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Details</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in _items)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Details</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => BeginEdit(item.Id)">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item.Id)">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private ItemCatalogEntry _model = new();
+    private List<ItemCatalogEntry> _items = new();
+    private string? _error;
+    private bool _isEditMode;
+    private int _editingId;
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _items = ItemCatalogService.GetAll().ToList();
+    }
+
+    private void SaveItem()
+    {
+        _error = null;
+
+        try
+        {
+            if (_isEditMode)
+            {
+                if (!ItemCatalogService.Update(new ItemCatalogEntry
+                    {
+                        Id = _editingId,
+                        Name = _model.Name,
+                        Details = _model.Details,
+                    }))
+                {
+                    _error = "Unable to update item.";
+                    return;
+                }
+            }
+            else
+            {
+                ItemCatalogService.Add(new ItemCatalogEntry
+                {
+                    Name = _model.Name,
+                    Details = _model.Details,
+                });
+            }
+
+            ResetForm();
+            Refresh();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private void DeleteItem(int id)
+    {
+        _error = null;
+
+        if (!ItemCatalogService.Delete(id))
+        {
+            _error = "Unable to delete item.";
+            return;
+        }
+
+        Refresh();
+    }
+
+    private void BeginEdit(int id)
+    {
+        var item = _items.FirstOrDefault(i => i.Id == id);
+        if (item is null)
+        {
+            return;
+        }
+
+        _isEditMode = true;
+        _editingId = item.Id;
+        _model = new ItemCatalogEntry
+        {
+            Name = item.Name,
+            Details = item.Details,
+        };
+    }
+
+    private void CancelEdit()
+    {
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        _isEditMode = false;
+        _editingId = 0;
+        _model = new ItemCatalogEntry();
+    }
+}

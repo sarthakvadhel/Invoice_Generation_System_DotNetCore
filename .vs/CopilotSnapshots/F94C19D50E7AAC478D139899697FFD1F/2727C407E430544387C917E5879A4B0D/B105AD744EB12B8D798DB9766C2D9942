@@ -1,0 +1,657 @@
+﻿@page "/invoices"
+
+@inject CustomerService CustomerService
+@inject InvoiceService InvoiceService
+@inject ItemCatalogService ItemCatalogService
+@inject IJSRuntime JS
+
+<PageTitle>Invoices</PageTitle>
+
+<div class="d-flex flex-column gap-4">
+    <div class="card shadow-sm form-card invoice-form-card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold fs-5">Invoice Builder</div>
+                <div class="small opacity-75">Create professional invoices with live totals</div>
+            </div>
+            @if (_isEditMode)
+            {
+                <button type="button" class="btn btn-sm btn-light" @onclick="CancelEditInvoice">Cancel edit</button>
+            }
+        </div>
+
+        <div class="card-body p-4">
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="alert alert-danger mb-3" role="alert">@_error</div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_success))
+            {
+                <div class="alert alert-success mb-3" role="alert">@_success</div>
+            }
+
+            @if (_customers.Count == 0)
+            {
+                <div class="alert alert-warning" role="alert">
+                    Create a customer first before creating invoices.
+                    <a class="ms-2" href="customers">Go to Customers</a>
+                </div>
+            }
+
+            <EditForm Model="_model" OnSubmit="HandleSubmit" FormName="save-invoice">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row g-3 mb-4">
+                    @if (_isEditMode)
+                    {
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Invoice #</label>
+                            <InputText class="form-control" @bind-Value="_model.InvoiceNumber" readonly />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Invoice #</label>
+                            <input class="form-control" value="Auto-generated on save" readonly />
+                        </div>
+                    }
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Customer</label>
+                        <div class="position-relative">
+                            <InputText id="customerNameInput" class="form-control" @bind-Value="_model.CustomerName" @bind-Value:event="oninput" autocomplete="off" placeholder="Type customer name..." />
+                            <div id="customerNameSuggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Status</label>
+                        <InputSelect class="form-select" @bind-Value="_model.Status">
+                            @foreach (var s in Enum.GetValues<InvoiceStatus>())
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Due date</label>
+                        <InputDate class="form-control" @bind-Value="_model.DueDate" />
+                    </div>
+
+                    <div class="col-12 col-md-8">
+                        <label class="form-label">Notes</label>
+                        <InputTextArea class="form-control" @bind-Value="_model.Notes" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Line items</h5>
+                    <span class="text-muted small">Last row auto-adds a new row</span>
+                </div>
+
+                <datalist id="catalog-items">
+                    @foreach (var item in _catalogItems)
+                    {
+                        <option value="@item.Name"></option>
+                    }
+                </datalist>
+
+                <div class="table-responsive mb-4">
+                    <table class="table align-middle invoice-line-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="min-width:240px;">Item</th>
+                                <th style="width:120px;">Qty</th>
+                                <th style="width:140px;">Unit Price</th>
+                                <th style="width:120px;">Tax %</th>
+                                <th class="text-end" style="width:160px;">Subtotal</th>
+                                <th style="width:90px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < _model.LineItems.Count; i++)
+                            {
+                                var li = _model.LineItems[i];
+                                var index = i;
+
+                                <tr>
+                                    <td>
+                                        <input class="form-control" list="catalog-items" value="@li.Description" @oninput="(e) => OnLineItemDescriptionInput(index, e)" placeholder="Item description" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" step="0.01" min="0" value="@li.Quantity" @oninput="(e) => OnLineItemQuantityInput(index, e)" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" step="0.01" min="0" value="@li.UnitPrice" @oninput="(e) => OnLineItemUnitPriceInput(index, e)" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" step="0.01" min="0" value="@li.TaxRate" @oninput="(e) => OnLineItemTaxRateInput(index, e)" />
+                                    </td>
+                                    <td class="text-end fw-semibold">@GetLineGrandTotal(li).ToString("C")</td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-link text-danger" @onclick="() => RemoveLineItem(index)">Remove</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row g-3 align-items-stretch mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="border rounded-3 h-100 p-3 bg-light-subtle">
+                            <div class="text-muted small">Invoice summary</div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span>Subtotal</span>
+                                <strong>@GetNetTotal().ToString("C")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <span>Total tax</span>
+                                <strong>@GetTaxTotal().ToString("C")</strong>
+                            </div>
+                            <hr class="my-2" />
+                            <div class="d-flex justify-content-between fs-5">
+                                <span>Final total</span>
+                                <strong>@GetGrandTotal().ToString("C")</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 d-flex align-items-end justify-content-lg-end">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4" disabled="@(_customers.Count == 0)">@(_isEditMode ? "Update invoice" : "Save invoice")</button>
+                            @if (_isEditMode)
+                            {
+                                <button type="button" class="btn btn-outline-secondary" @onclick="CancelEditInvoice">Cancel</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">Saved invoices</div>
+        <div class="card-body">
+            @if (_invoices.Count == 0)
+            {
+                <div class="text-muted">No invoices yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var inv in _invoices)
+                            {
+                                <tr>
+                                    <td>@inv.InvoiceNumber</td>
+                                    <td>@inv.Customer?.Name</td>
+                                    <td><span class="badge text-bg-light border">@inv.Status</span></td>
+                                    <td class="text-end">@inv.TotalAmount.ToString("C")</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => BeginEditInvoice(inv.Id)">Edit</button>
+                                        <button class="btn btn-sm btn-outline-secondary me-2" @onclick="() => PrintInvoiceAsync(inv.Id)">Print</button>
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteInvoice(inv.Id)">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (_printInvoice is not null)
+    {
+        <div class="print-sheet">
+            <h2>Invoice @_printInvoice.InvoiceNumber</h2>
+            <div><strong>Status:</strong> @_printInvoice.Status</div>
+            <div><strong>Issued:</strong> @_printInvoice.IssuedDate.ToString("d")</div>
+            <div><strong>Due:</strong> @_printInvoice.DueDate?.ToString("d")</div>
+
+            <hr />
+
+            <h4>Customer details</h4>
+            <div><strong>Name:</strong> @_printInvoice.Customer?.Name</div>
+            <div><strong>Email:</strong> @_printInvoice.Customer?.Email</div>
+            <div><strong>Phone:</strong> @_printInvoice.Customer?.Phone</div>
+            <div><strong>Address:</strong> @_printInvoice.Customer?.Address</div>
+
+            <hr />
+
+            <h4>Items</h4>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit</th>
+                        <th class="text-end">Tax %</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in _printInvoice.LineItems)
+                    {
+                        <tr>
+                            <td>@line.Description</td>
+                            <td class="text-end">@line.Quantity</td>
+                            <td class="text-end">@line.UnitPrice.ToString("C")</td>
+                            <td class="text-end">@line.TaxRate</td>
+                            <td class="text-end">@line.Subtotal.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="text-end mt-2"><strong>Total: @_printInvoice.TotalAmount.ToString("C")</strong></div>
+        </div>
+    }
+</div>
+
+@code {
+    private InvoiceCreateModel _model = new();
+    private List<Customer> _customers = new();
+    private List<Invoice> _invoices = new();
+    private List<ItemCatalogEntry> _catalogItems = new();
+    private string? _error;
+    private string? _success;
+    private bool _isEditMode;
+    private int _editingInvoiceId;
+    private Invoice? _printInvoice;
+    private const int MinimumLineItemPanels = 2;
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+        EnsureLineItemPanels();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("invoiceAutocomplete.init", "customerNameInput", "customerNameSuggestions", _customers.Select(c => c.Name).ToArray());
+    }
+
+    private void Refresh()
+    {
+        _customers = CustomerService.GetAll().ToList();
+        _invoices = InvoiceService.GetAll().ToList();
+        _catalogItems = ItemCatalogService.GetAll().ToList();
+    }
+
+    private void EnsureLineItemPanels()
+    {
+        while (_model.LineItems.Count < MinimumLineItemPanels)
+        {
+            _model.LineItems.Add(CreateEmptyLineItem());
+        }
+
+        if (_model.LineItems.Count > 0 && IsLineItemFilled(_model.LineItems[^1]))
+        {
+            _model.LineItems.Add(CreateEmptyLineItem());
+        }
+    }
+
+    private static InvoiceLineItem CreateEmptyLineItem()
+    {
+        return new InvoiceLineItem
+        {
+            Description = string.Empty,
+            Quantity = 1,
+            UnitPrice = 0,
+            TaxRate = 0,
+        };
+    }
+
+    private void OnLineItemDescriptionInput(int index, object? e)
+    {
+        if (!TryGetLineItem(index, out var item))
+        {
+            return;
+        }
+
+        item.Description = ExtractInputValue(e);
+        EnsureLineItemPanels();
+    }
+
+    private void OnLineItemQuantityInput(int index, object? e)
+    {
+        if (!TryGetLineItem(index, out var item))
+        {
+            return;
+        }
+
+        if (decimal.TryParse(ExtractInputValue(e), out var parsed))
+        {
+            item.Quantity = parsed;
+        }
+
+        EnsureLineItemPanels();
+    }
+
+    private void OnLineItemUnitPriceInput(int index, object? e)
+    {
+        if (!TryGetLineItem(index, out var item))
+        {
+            return;
+        }
+
+        if (decimal.TryParse(ExtractInputValue(e), out var parsed))
+        {
+            item.UnitPrice = parsed;
+        }
+
+        EnsureLineItemPanels();
+    }
+
+    private void OnLineItemTaxRateInput(int index, object? e)
+    {
+        if (!TryGetLineItem(index, out var item))
+        {
+            return;
+        }
+
+        if (decimal.TryParse(ExtractInputValue(e), out var parsed))
+        {
+            item.TaxRate = parsed;
+        }
+
+        EnsureLineItemPanels();
+    }
+
+    private bool TryGetLineItem(int index, out InvoiceLineItem item)
+    {
+        item = null!;
+        if (index < 0 || index >= _model.LineItems.Count)
+        {
+            return false;
+        }
+
+        item = _model.LineItems[index];
+        return true;
+    }
+
+    private static string ExtractInputValue(object? eventArg)
+    {
+        if (eventArg is ChangeEventArgs changeEventArgs)
+        {
+            return changeEventArgs.Value?.ToString() ?? string.Empty;
+        }
+
+        return eventArg?.ToString() ?? string.Empty;
+    }
+
+    private static bool IsLineItemFilled(InvoiceLineItem li)
+    {
+        return !string.IsNullOrWhiteSpace(li.Description)
+            || li.Quantity != 1
+            || li.UnitPrice != 0
+            || li.TaxRate != 0;
+    }
+
+    private static decimal GetLineNetTotal(InvoiceLineItem li)
+    {
+        var quantity = li.Quantity <= 0 ? 0 : li.Quantity;
+        var unitPrice = li.UnitPrice < 0 ? 0 : li.UnitPrice;
+        return quantity * unitPrice;
+    }
+
+    private static decimal GetLineTaxAmount(InvoiceLineItem li)
+    {
+        var taxRate = li.TaxRate < 0 ? 0 : li.TaxRate;
+        return GetLineNetTotal(li) * (taxRate / 100m);
+    }
+
+    private static decimal GetLineGrandTotal(InvoiceLineItem li)
+    {
+        return GetLineNetTotal(li) + GetLineTaxAmount(li);
+    }
+
+    private decimal GetNetTotal()
+    {
+        return _model.LineItems
+            .Where(IsLineItemFilled)
+            .Sum(GetLineNetTotal);
+    }
+
+    private decimal GetTaxTotal()
+    {
+        return _model.LineItems
+            .Where(IsLineItemFilled)
+            .Sum(GetLineTaxAmount);
+    }
+
+    private decimal GetGrandTotal()
+    {
+        return _model.LineItems
+            .Where(IsLineItemFilled)
+            .Sum(GetLineGrandTotal);
+    }
+
+    private void RemoveLineItem(int index)
+    {
+        if (index < 0 || index >= _model.LineItems.Count)
+        {
+            return;
+        }
+
+        _model.LineItems.RemoveAt(index);
+        EnsureLineItemPanels();
+    }
+
+    private void HandleSubmit(EditContext _)
+    {
+        SaveInvoice();
+    }
+
+    private void SaveInvoice()
+    {
+        _error = null;
+        _success = null;
+
+        try
+        {
+            var customer = ResolveCustomer(_model.CustomerName);
+            if (customer is null)
+            {
+                _error = "Select a valid customer name from suggestions.";
+                return;
+            }
+
+            var validLineItems = _model.LineItems
+                .Where(IsLineItemFilled)
+                .Select(li => new InvoiceLineItem
+                {
+                    Description = string.IsNullOrWhiteSpace(li.Description) ? "Item" : li.Description.Trim(),
+                    Quantity = li.Quantity <= 0 ? 1 : li.Quantity,
+                    UnitPrice = li.UnitPrice < 0 ? 0 : li.UnitPrice,
+                    TaxRate = li.TaxRate < 0 ? 0 : li.TaxRate,
+                })
+                .ToList();
+
+            if (validLineItems.Count == 0)
+            {
+                _error = "Add at least one item to save invoice.";
+                return;
+            }
+
+            var invoiceNumber = _isEditMode ? _model.InvoiceNumber : GenerateInvoiceNumber();
+
+            var invoice = new Invoice
+            {
+                InvoiceNumber = invoiceNumber,
+                CustomerId = customer.Id,
+                DueDate = _model.DueDate,
+                Status = _model.Status,
+                Notes = _model.Notes,
+                IssuedDate = DateTime.UtcNow,
+                LineItems = validLineItems,
+            };
+
+            if (_isEditMode)
+            {
+                if (!InvoiceService.Update(_editingInvoiceId, invoice))
+                {
+                    _error = "Unable to update invoice.";
+                    return;
+                }
+
+                _success = $"Invoice {invoiceNumber} updated successfully.";
+            }
+            else
+            {
+                InvoiceService.Add(invoice);
+                _success = $"Invoice created successfully. Invoice number: {invoiceNumber}";
+            }
+
+            ResetInvoiceForm();
+            Refresh();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private static string GenerateInvoiceNumber()
+    {
+        return $"INV-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}";
+    }
+
+    private Customer? ResolveCustomer(string? input)
+    {
+        var name = input?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        var exact = _customers.FirstOrDefault(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (exact is not null)
+        {
+            return exact;
+        }
+
+        var startsWith = _customers
+            .Where(c => c.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (startsWith.Count == 1)
+        {
+            return startsWith[0];
+        }
+
+        return null;
+    }
+
+    private void DeleteInvoice(int id)
+    {
+        _error = null;
+        _success = null;
+
+        if (!InvoiceService.Delete(id))
+        {
+            _error = "Unable to delete invoice.";
+            return;
+        }
+
+        _success = "Invoice deleted.";
+        Refresh();
+    }
+
+    private void BeginEditInvoice(int id)
+    {
+        _error = null;
+        _success = null;
+
+        var invoice = _invoices.FirstOrDefault(i => i.Id == id);
+        if (invoice is null)
+        {
+            return;
+        }
+
+        _isEditMode = true;
+        _editingInvoiceId = invoice.Id;
+        _model = new InvoiceCreateModel
+        {
+            InvoiceNumber = invoice.InvoiceNumber,
+            CustomerName = invoice.Customer?.Name ?? string.Empty,
+            DueDate = invoice.DueDate,
+            Status = invoice.Status,
+            Notes = invoice.Notes,
+        };
+
+        foreach (var line in invoice.LineItems)
+        {
+            _model.LineItems.Add(new InvoiceLineItem
+            {
+                Description = line.Description,
+                Quantity = line.Quantity,
+                UnitPrice = line.UnitPrice,
+                TaxRate = line.TaxRate,
+            });
+        }
+
+        EnsureLineItemPanels();
+    }
+
+    private void CancelEditInvoice()
+    {
+        ResetInvoiceForm();
+    }
+
+    private void ResetInvoiceForm()
+    {
+        _isEditMode = false;
+        _editingInvoiceId = 0;
+        _model = new InvoiceCreateModel();
+        EnsureLineItemPanels();
+    }
+
+    private async Task PrintInvoiceAsync(int id)
+    {
+        _error = null;
+
+        _printInvoice = _invoices.FirstOrDefault(i => i.Id == id);
+        if (_printInvoice is null)
+        {
+            _error = "Unable to print invoice.";
+            return;
+        }
+
+        await InvokeAsync(StateHasChanged);
+        await JS.InvokeVoidAsync("print");
+    }
+
+    private sealed class InvoiceCreateModel
+    {
+        public string InvoiceNumber { get; set; } = string.Empty;
+
+        [Required]
+        public string CustomerName { get; set; } = string.Empty;
+
+        public DateTime? DueDate { get; set; }
+
+        public InvoiceStatus Status { get; set; } = InvoiceStatus.Draft;
+
+        public string? Notes { get; set; }
+
+        public List<InvoiceLineItem> LineItems { get; } = new();
+    }
+}

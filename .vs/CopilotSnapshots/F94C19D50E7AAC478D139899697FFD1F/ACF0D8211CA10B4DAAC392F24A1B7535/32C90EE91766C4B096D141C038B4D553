@@ -1,0 +1,90 @@
+﻿using InvoiceSystem.Shared.Models;
+
+namespace InvoiceSystem.Web.Services;
+
+public sealed class InvoiceService
+{
+    private readonly object _gate = new();
+    private readonly List<Invoice> _invoices = new();
+    private int _nextInvoiceId = 1;
+    private int _nextLineItemId = 1;
+
+    private readonly CustomerService _customerService;
+
+    public InvoiceService(CustomerService customerService)
+    {
+        _customerService = customerService;
+    }
+
+    public IReadOnlyList<Invoice> GetAll()
+    {
+        lock (_gate)
+        {
+            return _invoices
+                .OrderByDescending(i => i.IssuedDate)
+                .ToList();
+        }
+    }
+
+    public Invoice? GetById(int id)
+    {
+        lock (_gate)
+        {
+            return _invoices.FirstOrDefault(i => i.Id == id);
+        }
+    }
+
+    public Invoice Add(Invoice invoice)
+    {
+        if (invoice is null)
+        {
+            throw new ArgumentNullException(nameof(invoice));
+        }
+
+        var customer = _customerService.GetById(invoice.CustomerId);
+        if (customer is null)
+        {
+            throw new InvalidOperationException("Customer not found.");
+        }
+
+        lock (_gate)
+        {
+            invoice.Id = _nextInvoiceId++;
+            invoice.Customer = customer;
+            invoice.LineItems ??= new List<InvoiceLineItem>();
+
+            foreach (var li in invoice.LineItems)
+            {
+                li.Id = _nextLineItemId++;
+                li.InvoiceId = invoice.Id;
+                li.Invoice = invoice;
+            }
+
+            _invoices.Add(invoice);
+
+            customer.Invoices ??= new List<Invoice>();
+            customer.Invoices.Add(invoice);
+
+            return invoice;
+        }
+    }
+
+    public bool Delete(int id)
+    {
+        lock (_gate)
+        {
+            var invoice = _invoices.FirstOrDefault(i => i.Id == id);
+            if (invoice is null)
+            {
+                return false;
+            }
+
+            _invoices.Remove(invoice);
+
+            var customer = _customerService.GetById(invoice.CustomerId);
+            customer?.Invoices?.Remove(invoice);
+
+            return true;
+        }
+    }
+}

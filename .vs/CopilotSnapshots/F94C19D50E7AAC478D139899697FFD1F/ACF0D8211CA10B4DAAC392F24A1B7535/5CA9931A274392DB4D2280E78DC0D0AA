@@ -1,0 +1,127 @@
+﻿@page "/items"
+
+@inject ItemCatalogService ItemCatalogService
+
+<PageTitle>Items</PageTitle>
+
+<h1>Items</h1>
+
+@if (!string.IsNullOrWhiteSpace(_error))
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+<div class="row g-4">
+    <div class="col-12 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header">Add item</div>
+            <div class="card-body">
+                <EditForm Model="_model" OnValidSubmit="AddItem" FormName="add-item">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label class="form-label">Item name</label>
+                        <InputText class="form-control" @bind-Value="_model.Name" />
+                        <ValidationMessage For="() => _model.Name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Details</label>
+                        <InputTextArea class="form-control" @bind-Value="_model.Details" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save item</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header">Item list</div>
+            <div class="card-body">
+                @if (_items.Count == 0)
+                {
+                    <div class="text-muted">No items yet.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Details</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in _items)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        <td>@item.Details</td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteItem(item.Id)">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ItemCatalogEntry _model = new();
+    private List<ItemCatalogEntry> _items = new();
+    private string? _error;
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _items = ItemCatalogService.GetAll().ToList();
+    }
+
+    private void AddItem()
+    {
+        _error = null;
+
+        try
+        {
+            ItemCatalogService.Add(new ItemCatalogEntry
+            {
+                Name = _model.Name,
+                Details = _model.Details,
+            });
+
+            _model = new ItemCatalogEntry();
+            Refresh();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private void DeleteItem(int id)
+    {
+        _error = null;
+
+        if (!ItemCatalogService.Delete(id))
+        {
+            _error = "Unable to delete item.";
+            return;
+        }
+
+        Refresh();
+    }
+}
