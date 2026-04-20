@@ -1,41 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.API\\InvoiceSystem.API.csproj": {}
+    "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.API/InvoiceSystem.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.API\\InvoiceSystem.API.csproj": {
+    "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.API/InvoiceSystem.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.API\\InvoiceSystem.API.csproj",
+        "projectUniqueName": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.API/InvoiceSystem.API.csproj",
         "projectName": "InvoiceSystem.API",
-        "projectPath": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.API\\InvoiceSystem.API.csproj",
-        "packagesPath": "C:\\Users\\sarthak\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.API\\obj\\",
+        "projectPath": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.API/InvoiceSystem.API.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.API/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\sarthak\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
-            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\InvoiceSystem.Shared.csproj": {
-                "projectPath": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\InvoiceSystem.Shared.csproj"
+              "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj": {
+                "projectPath": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj"
               }
             }
           }
@@ -50,11 +42,10 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net9.0": {
-          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "Microsoft.AspNetCore.OpenApi": {
@@ -95,38 +86,30 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300-preview.0.26177.108/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\InvoiceSystem.Shared.csproj": {
+    "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\InvoiceSystem.Shared.csproj",
+        "projectUniqueName": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj",
         "projectName": "InvoiceSystem.Shared",
-        "projectPath": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\InvoiceSystem.Shared.csproj",
-        "packagesPath": "C:\\Users\\sarthak\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sarthak\\Downloads\\Invoice_Generation_System_DotNetCore-main\\src\\InvoiceSystem.Shared\\obj\\",
+        "projectPath": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/InvoiceSystem.Shared.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/Invoice_Generation_System_DotNetCore/Invoice_Generation_System_DotNetCore/src/InvoiceSystem.Shared/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\sarthak\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
-            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {}
           }
@@ -141,11 +124,10 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net9.0": {
-          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore.Sqlite": {
@@ -169,7 +151,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300-preview.0.26177.108/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

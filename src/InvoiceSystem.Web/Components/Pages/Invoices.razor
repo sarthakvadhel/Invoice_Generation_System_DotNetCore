@@ -5,6 +5,7 @@
 @inject ItemCatalogService ItemCatalogService
 @inject PdfService PdfService
 @inject IJSRuntime JS
+@using System.Globalization
 
 <PageTitle>Invoices</PageTitle>
 
@@ -132,7 +133,7 @@
                                     <td>
                                         <input class="form-control" type="number" step="0.01" min="0" value="@li.TaxRate" @oninput="(e) => OnLineItemTaxRateInput(index, e)" />
                                     </td>
-                                    <td class="text-end fw-semibold">@GetLineGrandTotal(li).ToString("C")</td>
+                                    <td class="text-end fw-semibold">@FormatCurrency(GetLineGrandTotal(li))</td>
                                     <td class="text-end">
                                         <button type="button" class="btn btn-sm btn-link text-danger" @onclick="() => RemoveLineItem(index)">Remove</button>
                                     </td>
@@ -148,16 +149,16 @@
                             <div class="text-muted small">Invoice summary</div>
                             <div class="d-flex justify-content-between mt-2">
                                 <span>Subtotal</span>
-                                <strong>@GetNetTotal().ToString("C")</strong>
+                                <strong>@FormatCurrency(GetNetTotal())</strong>
                             </div>
                             <div class="d-flex justify-content-between mt-1">
                                 <span>Total tax</span>
-                                <strong>@GetTaxTotal().ToString("C")</strong>
+                                <strong>@FormatCurrency(GetTaxTotal())</strong>
                             </div>
                             <hr class="my-2" />
                             <div class="d-flex justify-content-between fs-5">
                                 <span>Final total</span>
-                                <strong>@GetGrandTotal().ToString("C")</strong>
+                                <strong>@FormatCurrency(GetGrandTotal())</strong>
                             </div>
                         </div>
                     </div>
@@ -203,7 +204,7 @@
                                     <td>@inv.InvoiceNumber</td>
                                     <td>@inv.Customer?.Name</td>
                                     <td><span class="badge text-bg-light border">@inv.Status</span></td>
-                                    <td class="text-end">@inv.TotalAmount.ToString("C")</td>
+                                    <td class="text-end">@FormatCurrency(inv.TotalAmount)</td>
                                     <td class="text-end">
                                         <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => BeginEditInvoice(inv.Id)">Edit</button>
                                         <button class="btn btn-sm btn-outline-secondary me-2" @onclick="() => PrintInvoiceAsync(inv.Id)" disabled="@_isPdfGenerating">
@@ -234,6 +235,7 @@
     private int _editingInvoiceId;
     private bool _isPdfGenerating;
     private const int MinimumLineItemPanels = 2;
+    private static readonly CultureInfo RupeeCulture = CultureInfo.GetCultureInfo("en-IN");
 
     protected override void OnInitialized()
     {
@@ -384,6 +386,11 @@
     private static decimal GetLineGrandTotal(InvoiceLineItem li)
     {
         return GetLineNetTotal(li) + GetLineTaxAmount(li);
+    }
+
+    private static string FormatCurrency(decimal amount)
+    {
+        return amount.ToString("C", RupeeCulture);
     }
 
     private decimal GetNetTotal()
