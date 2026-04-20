@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InvoiceSystem.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e686ce69a403fd43e28eb96a1e0663b0acb6d8f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c30ca95de4ec3a898bc009d893e8922b22cc47cc")]
 [assembly: System.Reflection.AssemblyProductAttribute("InvoiceSystem.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InvoiceSystem.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
